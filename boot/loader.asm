@@ -2,7 +2,7 @@
 [ORG 0x7e00]
 
 start:
-    mov [DriverId],dl
+    mov [DriveId],dl
 
     ;check if input is allowed
     mov eax,0x80000000
