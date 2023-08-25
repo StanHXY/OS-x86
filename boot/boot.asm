@@ -1,7 +1,7 @@
 [BITS 16] ;boot code running in 16 bits mode
 [ORG 0x7c00] ;BIOS load the boot code from first sector to 0x7c00
 
-
+; Boot
 ; Initialize Segment Registers & Stack Pointers
 start:
     xor ax,ax ;Zeros ax register
