@@ -10,6 +10,15 @@ start:
     mov ss,ax
     mov sp,0x7c00
 
+TestDiskExtension:
+    mov [DriveId],dl
+    mov ah,0x41
+    mov bx,0x55aa
+    int 0x13
+    jc NotSupport
+    cmp bx,0xaa55
+    jne NotSupport
+
 PrintMessage:
     mov ah,0x13 ;0x13(print string), ah holds function code
     mov al,1 ; al(write mode), 1 means cursor will be placed at end of string
@@ -19,12 +28,15 @@ PrintMessage:
     mov cx,MessageLen
     int 0x10 ;call BIOS interrupts, interrupt 0x10 is PRINT
 
+NotSupport:
 End:
     hlt
     jmp End
 
 
-Message:  db "Hello"
+DriveId:  db 0
+
+Message:  db "Disk extension is supported"
 
 MessageLen: equ $-Message
 
