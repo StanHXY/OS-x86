@@ -52,6 +52,22 @@ GetMemInfo:
     jnz GetMemInfo
 
 GetMemDone:
+    
+
+TestA20:
+    mov ax,0xffff
+    mov es,ax
+    mov word[ds:0x7c00],0xa200
+    cmp word[es:0x7c10],0xa200
+    jne SetA20LineDone
+    mov word[0x7c00],0xb200
+    cmp word[es:0x7c10],0xb200
+    je End
+
+
+SetA20LineDone:
+    xor ax,ax
+    mov es,ax
     mov ah,0x13 ;0x13(print string), ah holds function code
     mov al,1 ; al(write mode), 1 means cursor will be placed at end of string
     mov bx,0xa ; bx(character attributes), 0xa(bright green)
@@ -59,6 +75,7 @@ GetMemDone:
     mov bp,Message
     mov cx,MessageLen
     int 0x10 ;call BIOS interrupts, interrupt 0x10 is PRINT
+
 
 ; use infinite loop to halt the processor
 ReadError:
@@ -69,6 +86,6 @@ End:
 
 
 DriveId: db 0
-Message:  db "Get Memory Info Done"
+Message:  db "A20 line is on"
 MessageLen: equ $-Message
 ReadPacket: times 16 db 0
