@@ -72,21 +72,87 @@ SetA20LineDone:
 SetVideoMode:
     mov ax,3
     int 0x10
-    mov si,Message
-    mov ax,0xb800
+    
+    ; Enable Protected Mode
+    cli;clear interrupt flags, disable interrupt when Mode Switch
+    lgdt [Gdt32Ptr]
+    lidt [Idt32Ptr]
+
+    mov eax,cr0
+    or eax,1
+    mov cr0,eax
+
+    jmp 8:PMEntry
+
+; use infinite loop to halt the processor
+ReadError:
+NotSupport:
+End:
+    hlt
+    jmp End
+
+[BITS 32]
+PMEntry:
+    mov ax,0x10
+    mov ds,ax
     mov es,ax
-    xor di,di
-    mov cx,MessageLen ;cx as loop counter
+    mov ss,ax
+    mov esp,0x7c00 ;stack pointer
 
-PrintMessage:
-    mov al,[si]
-    mov [es:di],al
-    mov byte[es:di+1],0xa
+    mov byte[0xb8000],'P'
+    mov byte[0xb8001],0xa
 
-    add di,2
-    add si,1
+PEnd:
+    hlt
+    jmp PEnd
 
-    loop PrintMessage
+
+
+DriveId: db 0
+; Message:  db "Text Mode is set"
+; MessageLen: equ $-Message
+ReadPacket: times 16 db 0
+
+Gdt32:
+    dq 0
+Code32:
+    dw 0xffff
+    dw 0
+    db 0
+    db 0x9a
+    db 0xcf
+    db 0
+Data32:
+    dw 0xffff
+    dw 0
+    db 0
+    db 0x92
+    db 0xcf
+    db 0
+
+Gdt32Len: equ $-Gdt32
+
+Gdt32Ptr: dw Gdt32Len-1
+          dd Gdt32
+
+Idt32Ptr: dw 0
+          dd 0
+
+;     mov si,Message
+;     mov ax,0xb800
+;     mov es,ax
+;     xor di,di
+;     mov cx,MessageLen ;cx as loop counter
+
+; PrintMessage:
+;     mov al,[si]
+;     mov [es:di],al
+;     mov byte[es:di+1],0xa
+
+;     add di,2
+;     add si,1
+
+;     loop PrintMessage
 
 
 
@@ -97,17 +163,3 @@ PrintMessage:
     ; mov bp,Message
     ; mov cx,MessageLen
     ; int 0x10 ;call BIOS interrupts, interrupt 0x10 is PRINT
-
-
-; use infinite loop to halt the processor
-ReadError:
-NotSupport:
-End:
-    hlt
-    jmp End
-
-
-DriveId: db 0
-Message:  db "Text Mode is set"
-MessageLen: equ $-Message
-ReadPacket: times 16 db 0
