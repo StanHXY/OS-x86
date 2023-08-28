@@ -31,6 +31,27 @@ LoadKernel:
     int 0x13
     jc ReadError
 
+GetMemInfoStart:
+    mov eax,0xe820
+    mov edx,0x534d4150
+    mov ecx,20
+    mov edi, 0x9000
+    xor ebx,ebx
+    int 0x15 ;memory map service
+    jc NotSupport
+
+GetMemInfo:
+    add edi,20; each memory block info is 20 bytes
+    mov eax,0xe820
+    mov edx,0x534d4150
+    mov ecx,20
+    int 0x15
+    jc GetMemDone
+
+    test ebx,ebx
+    jnz GetMemInfo
+
+GetMemDone:
     mov ah,0x13 ;0x13(print string), ah holds function code
     mov al,1 ; al(write mode), 1 means cursor will be placed at end of string
     mov bx,0xa ; bx(character attributes), 0xa(bright green)
@@ -48,6 +69,6 @@ End:
 
 
 DriveId: db 0
-Message:  db "Kernel Loaded"
+Message:  db "Get Memory Info Done"
 MessageLen: equ $-Message
 ReadPacket: times 16 db 0
