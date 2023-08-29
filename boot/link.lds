@@ -8,12 +8,11 @@ SECTIONS
         *(.text)
     }
 
-    rodata : {
+    .rodata : {
         *(.rodata)
     }
 
     . = ALIGN(16);
-
     .data : {
         *(.data)
     }

@@ -1,5 +1,5 @@
-;global, static
 section .data
+
 Gdt64:
     dq 0
     dq 0x0020980000000000
@@ -14,31 +14,24 @@ TssDesc:
     db 0
     dq 0
 
-
 Gdt64Len: equ $-Gdt64
-
 
 Gdt64Ptr: dw Gdt64Len-1
           dq Gdt64
 
-
 Tss:
     dd 0
-    dq 0x150000
+    dq 0x190000
     times 88 db 0
     dd TssLen
 
 TssLen: equ $-Tss
 
-
 section .text
 extern KMain
 global start
 
-
-
 start:
-    
     lgdt [Gdt64Ptr]
 
 SetTss:
@@ -52,8 +45,6 @@ SetTss:
     mov [TssDesc+8],eax
     mov ax,0x20
     ltr ax
-
-    
 
 InitPIT:
     mov al,(1<<2)|(3<<4)
@@ -100,6 +91,3 @@ KernelEntry:
 End:
     hlt
     jmp End
-
-
-
