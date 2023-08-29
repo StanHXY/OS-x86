@@ -187,28 +187,3 @@ Gdt64Len: equ $-Gdt64
 Gdt64Ptr: dw Gdt32Len-1
           dd Gdt64
 
-;     mov si,Message
-;     mov ax,0xb800
-;     mov es,ax
-;     xor di,di
-;     mov cx,MessageLen ;cx as loop counter
-
-; PrintMessage:
-;     mov al,[si]
-;     mov [es:di],al
-;     mov byte[es:di+1],0xa
-
-;     add di,2
-;     add si,1
-
-;     loop PrintMessage
-
-
-
-    ; mov ah,0x13 ;0x13(print string), ah holds function code
-    ; mov al,1 ; al(write mode), 1 means cursor will be placed at end of string
-    ; mov bx,0xa ; bx(character attributes), 0xa(bright green)
-    ; xor dx,dx ;Zeros the dx(starts of screen)
-    ; mov bp,Message
-    ; mov cx,MessageLen
-    ; int 0x10 ;call BIOS interrupts, interrupt 0x10 is PRINT
