@@ -52,8 +52,6 @@ GetMemInfo:
     jnz GetMemInfo
 
 GetMemDone:
-    
-
 TestA20:
     mov ax,0xffff
     mov es,ax
@@ -105,7 +103,7 @@ PMEntry:
     mov ecx,0x10000/4
     rep stosd
 
-    mov dword[0x80000],0x81007
+    mov dword[0x80000],0x1007
     mov dword[0x81000],10000111b
 
     lgdt [Gdt64Ptr]
@@ -137,8 +135,13 @@ PEnd:
 LMEntry:
     mov rsp,0x7c00
 
-    mov byte[0xb8000],'L'
-    mov byte[0xb8001],0xa
+    cld
+    mov rdi,0x200000
+    mov rsi,0x10000
+    mov rcx,51200/8
+    rep movsq
+
+    jmp 0x200000
 
 LEnd:
     hlt
