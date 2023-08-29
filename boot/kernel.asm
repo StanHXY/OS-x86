@@ -25,6 +25,9 @@ KernelEntry:
     mov byte[0xb8000],'K'
     mov byte[0xb8001],0xa
 
+    xor rbx,rbx
+    div rbx
+
 
 End:
     hlt
