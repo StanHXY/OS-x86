@@ -4,44 +4,42 @@
 start:
     mov [DriveId],dl
 
-    ;check if input is allowed
     mov eax,0x80000000
     cpuid
     cmp eax,0x80000001
-    jb NotSupport; jump if below
+    jb NotSupport
 
-    ; get processor features, check if LONG mode is supported
     mov eax,0x80000001
     cpuid
-    test edx, (1<<29) ;check long mode support
-    jz NotSupport ; check zero flag
-    test edx,(1<<26) ;check if support 1g page
+    test edx,(1<<29)
+    jz NotSupport
+    test edx,(1<<26)
     jz NotSupport
 
 LoadKernel:
     mov si,ReadPacket
-    mov word[si],0x10 ; size
-    mov word[si+2],100 ; read 100 sectors
-    mov word[si+4],0 ; offset
-    mov word[si+6],0x1000 ; segment. 0x1000 * 16 + 0 = 0x100000 (kernel)
-    mov dword[si+8], 6; boot file: 1 sector, loader: 5 sectors (0 based)
-    mov dword[si+12],0
+    mov word[si],0x10
+    mov word[si+2],100
+    mov word[si+4],0
+    mov word[si+6],0x1000
+    mov dword[si+8],6
+    mov dword[si+0xc],0
     mov dl,[DriveId]
-    mov ah,0x42 ; 0x42(disk extension service)
+    mov ah,0x42
     int 0x13
-    jc ReadError
+    jc  ReadError
 
 GetMemInfoStart:
     mov eax,0xe820
     mov edx,0x534d4150
     mov ecx,20
-    mov edi, 0x9000
+    mov edi,0x9000
     xor ebx,ebx
-    int 0x15 ;memory map service
+    int 0x15
     jc NotSupport
 
 GetMemInfo:
-    add edi,20; each memory block info is 20 bytes
+    add edi,20
     mov eax,0xe820
     mov edx,0x534d4150
     mov ecx,20
@@ -61,7 +59,7 @@ TestA20:
     mov word[0x7c00],0xb200
     cmp word[es:0x7c10],0xb200
     je End
-
+    
 
 SetA20LineDone:
     xor ax,ax
@@ -71,8 +69,7 @@ SetVideoMode:
     mov ax,3
     int 0x10
     
-    ; Enable Protected Mode
-    cli;clear interrupt flags, disable interrupt when Mode Switch
+    cli
     lgdt [Gdt32Ptr]
     lidt [Idt32Ptr]
 
@@ -82,12 +79,12 @@ SetVideoMode:
 
     jmp 8:PMEntry
 
-; use infinite loop to halt the processor
 ReadError:
 NotSupport:
 End:
     hlt
     jmp End
+
 
 [BITS 32]
 PMEntry:
@@ -95,16 +92,16 @@ PMEntry:
     mov ds,ax
     mov es,ax
     mov ss,ax
-    mov esp,0x7c00 ;stack pointer
+    mov esp,0x7c00
 
     cld
-    mov edi,0x80000
+    mov edi,0x70000
     xor eax,eax
     mov ecx,0x10000/4
     rep stosd
-
-    mov dword[0x80000],0x1007
-    mov dword[0x81000],10000111b
+    
+    mov dword[0x70000],0x71007
+    mov dword[0x71000],10000111b
 
     lgdt [Gdt64Ptr]
 
@@ -112,7 +109,7 @@ PMEntry:
     or eax,(1<<5)
     mov cr4,eax
 
-    mov eax,0x80000
+    mov eax,0x70000
     mov cr3,eax
 
     mov ecx,0xc0000080
@@ -130,7 +127,6 @@ PEnd:
     hlt
     jmp PEnd
 
-
 [BITS 64]
 LMEntry:
     mov rsp,0x7c00
@@ -142,15 +138,14 @@ LMEntry:
     rep movsq
 
     jmp 0x200000
-
+    
 LEnd:
     hlt
     jmp LEnd
+    
+    
 
-
-DriveId: db 0
-; Message:  db "Text Mode is set"
-; MessageLen: equ $-Message
+DriveId:    db 0
 ReadPacket: times 16 db 0
 
 Gdt32:
@@ -169,7 +164,7 @@ Data32:
     db 0x92
     db 0xcf
     db 0
-
+    
 Gdt32Len: equ $-Gdt32
 
 Gdt32Ptr: dw Gdt32Len-1
@@ -178,12 +173,13 @@ Gdt32Ptr: dw Gdt32Len-1
 Idt32Ptr: dw 0
           dd 0
 
+
 Gdt64:
     dq 0
     dq 0x0020980000000000
 
 Gdt64Len: equ $-Gdt64
 
-Gdt64Ptr: dw Gdt32Len-1
-          dd Gdt64
 
+Gdt64Ptr: dw Gdt64Len-1
+          dd Gdt64
