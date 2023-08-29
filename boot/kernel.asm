@@ -3,15 +3,14 @@
 
 start:
     mov rdi,Idt
-    mov rax,handler0
-
+    
+    mov rax,Handler0
     mov [rdi],ax
     shr rax,16
     mov [rdi+6],ax
     shr rax,16
     mov [rdi+8],eax
 
-    ;Timer entry
     mov rax,Timer
     add rdi,32*16
     mov [rdi],ax
@@ -23,19 +22,14 @@ start:
     lgdt [Gdt64Ptr]
     lidt [IdtPtr]
 
-
     push 8
     push KernelEntry
     db 0x48
-
     retf
 
 KernelEntry:
     mov byte[0xb8000],'K'
     mov byte[0xb8001],0xa
-
-    xor rbx,rbx
-    div rbx
 
 InitPIT:
     mov al,(1<<2)|(3<<4)
@@ -46,7 +40,6 @@ InitPIT:
     mov al,ah
     out 0x40,al
 
-;set up interrupt controller
 InitPIC:
     mov al,0x11
     out 0x20,al
@@ -71,15 +64,13 @@ InitPIC:
     mov al,11111111b
     out 0xa1,al
 
-    sti 
-
+    sti
 
 End:
     hlt
     jmp End
 
-handler0:
-
+Handler0:
     push rax
     push rbx  
     push rcx
@@ -117,7 +108,7 @@ handler0:
     pop	rbx
     pop	rax
 
-    iretq ;interrupt return
+    iretq
 
 Timer:
     push rax
@@ -136,11 +127,10 @@ Timer:
     push r14
     push r15
 
-    mov byte[0xb8010],'T'
-    mov byte[0xb8011],0xe
-
+    mov byte[0xb8020],'T'
+    mov byte[0xb8021],0xe
     jmp End
-
+   
     pop	r15
     pop	r14
     pop	r13
@@ -159,8 +149,6 @@ Timer:
 
     iretq
 
-
-
 Gdt64:
     dq 0
     dq 0x0020980000000000
@@ -173,19 +161,17 @@ Gdt64Ptr: dw Gdt64Len-1
 
 
 Idt:
-    ;repeat:
-    %rep 256 
-        dw 0 ;declare word: 2 bytes
-        dw 0x8 
-        db 0 ;declare byte: 1 byte
+    %rep 256
+        dw 0
+        dw 0x8
+        db 0
         db 0x8e
         dw 0
-        db 0
-        db 0
+        dd 0
+        dd 0
     %endrep
 
 IdtLen: equ $-Idt
 
 IdtPtr: dw IdtLen-1
         dq Idt
-
