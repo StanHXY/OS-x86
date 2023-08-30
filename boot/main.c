@@ -3,7 +3,7 @@
 #include "stddef.h"
 #include "trap.h"
 #include "print.h"
-#include "assert.h"
+#include "debug.h"
 
 void KMain(void){
 
