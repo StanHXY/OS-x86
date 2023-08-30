@@ -3,6 +3,7 @@
 #include "stddef.h"
 #include "trap.h"
 #include "print.h"
+#include "assert.h"
 
 void KMain(void){
 
@@ -11,7 +12,9 @@ void KMain(void){
 
     init_idt();
 
-    printk("%s/n", string);
+    printk("%s\n", string);
     printk("Equal to %x", value);
+
+    ASSERT(0);
 
 }
