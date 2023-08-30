@@ -4,13 +4,13 @@
 #include "stdint.h"
 
 // stores memory info retreived from BIOS
-struct E820{
+struct E820 {
     uint64_t address;
     uint64_t length;
     uint32_t type;
-}__attribute__((packed));
+} __attribute__((packed));
 
-struct FreeMemRegion{
+struct FreeMemRegion {
     uint64_t address;
     uint64_t length;
 };
