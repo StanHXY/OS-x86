@@ -85,8 +85,13 @@ InitPIC:
     retf
 
 KernelEntry:
+    ;test interrupts
+    xor ax,ax
+    mov ss,ax
+
     mov rsp,0x200000
     call KMain
+    sti
 
 End:
     hlt
