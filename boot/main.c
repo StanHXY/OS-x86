@@ -4,17 +4,11 @@
 #include "trap.h"
 #include "print.h"
 #include "debug.h"
+#include "memory.h"
 
 void KMain(void){
 
-    char* string = "Hello";
-    int64_t value = 0x12345ABD;
-
     init_idt();
-
-    printk("%s\n", string);
-    printk("Equal to %x", value);
-
-    ASSERT(0);
+    init_memory();
 
 }
